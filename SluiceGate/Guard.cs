@@ -4,23 +4,25 @@ using System.Text;
 
 namespace SluiceGate
 {
+
     class Guard
     {
- 
+        public List<Ship> ShipList = new List<Ship>();
+        public int LengthShipsInSluice = 0;
         public Guard()
         {
-            int LengthShipsInSluice =0;
-            const double SluiceDepth = 3.00;
 
-        }
+        //  const double SluiceDepth = 3.00;
 
- 
-        public Ship EnterNewShip()
+    }
+
+
+    public Ship EnterNewShip()
         {
             Console.WriteLine("What's the shipsname?");
             string name=Console.ReadLine();
-            Console.WriteLine("What's the length of the ship?");
-            int length = Convert.ToInt32(Console.ReadLine());
+            Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong"); {
+            Length length = (Length)((char.ToUpper(Console.ReadKey().KeyChar) == 'S') ? Length.Small : (char.ToUpper(Console.ReadKey().KeyChar) == 'M') ? Length.Medium : (char.ToUpper(Console.ReadKey().KeyChar) == 'L') ? Length.Long: Length.Special); // 
             Console.WriteLine("What's the Draft of the ship? (in meters)");
             double draft = Convert.ToDouble(Console.ReadLine());
             Console.WriteLine("What's direction are we going? up? or down? type 1 for up 0 for down");
@@ -32,6 +34,18 @@ namespace SluiceGate
         {
             int sluice=0;
             return sluice;
+        }
+        public bool CheckDraft(Ship ship)
+        {
+            bool draftIsOk=true;
+            if (ship.Draft > 2.75) draftIsOk = false;
+            return draftIsOk;
+        }
+
+        public int CheckLength(Ship ship)
+        {
+            int length = ship.Length;
+            return length;
         }
     }
 }
