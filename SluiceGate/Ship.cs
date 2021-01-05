@@ -16,32 +16,45 @@ namespace SluiceGate
             }
             set
             {
-                if (value > 4) { length = 4; } else if (value < 1 ) { length = 1; }
+               if (value < 1 ) { length = 1; } else { length = value; }
             } 
         }
         private int length;
-        private DateTime arrivalTime = DateTime.Now;
-        public double Draft { get; set; }
+        public DateTime ArrivalTime = DateTime.Now;
+        public double Draft
+        {
+            get
+            {
+                return draft;
+            }
+            set
+            {
+                if (value < 0.25) { draft = 0.25; } else { draft = value; }
+            }
+        }
+        
+
+
         private double draft;
-        public bool Direction { get; set; }
+        public bool isUpstream { get; set; }
         public Ship()
         {
             id++;
             Name = "Not Set";
-            Length = 2;
-            arrivalTime = DateTime.Now;
+            Length Length = (Length)2;
+            ArrivalTime = DateTime.Now;
             Draft = 1.75;
-            Direction = true; // true is up (bruikbaar voor tol te betalen)
+            isUpstream = true; // true is up (bruikbaar voor tol te betalen)
 
         }
         public Ship(string name, int length, double draft, bool direction )
         {
             id++;
             Name = name;
-            Length = length;
-            arrivalTime = DateTime.Now;
+            Length Length = (Length)length;
+            ArrivalTime = DateTime.Now;
             Draft = draft;
-            Direction = direction; // true is up (bruikbaar voor tol te betalen)
+            isUpstream = direction; // true is up (bruikbaar voor tol te betalen)
 
         }
     }
