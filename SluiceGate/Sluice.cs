@@ -45,6 +45,25 @@ namespace SluiceGate
             }
         }
 
+        internal void ViewShips()
+        {
+            Console.Clear();
+            if (GlobalVar.ShipList.Count > 0)
+            {
+                foreach (Ship ship in GlobalVar.ShipList)
+                {
+                    Console.WriteLine($"arrived and added in sluice at {ship.ArrivalTime}" +
+                        $" name:{ship.Name} length:{(int)ship.Length * 30}m going {(ship.IsUpstream ? "upstream" : "downstream")}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("The Shiplist is currently empty.");
+            }
+            Console.WriteLine("press any key to return to the menu");
+            Console.ReadKey();
+        }
+
         public void AddShips()
         {
             bool keeprunning;
