@@ -1,12 +1,10 @@
 using System;
 using System.Collections.Generic;
-using System.Text;
 
 namespace SluiceGate
 {
     public static class GlobalVar
     {
-
         private static string documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
 
         // Set required doc paths
@@ -19,7 +17,6 @@ namespace SluiceGate
         public static int LengthShipsInSluiceUpStream = 0;
         public static int LengthShipsInSluiceDownStream = 0;
 
-        public const int SluiceLength = 5 ;
+        public const int SluiceLength = 5;
     }
-  
 }
