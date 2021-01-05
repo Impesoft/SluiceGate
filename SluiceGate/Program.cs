@@ -4,11 +4,12 @@ using System.IO;
 
 namespace SluiceGate
 {
-    internal class Program
+    class Program
     {
 
         private static void Main(string[] args)
         {
+
             if (File.Exists(GlobalVar.PathShipList))
             {
                 GlobalVar.ShipList = FileIO.ReadShipsFromFile(GlobalVar.PathShipList);
@@ -70,5 +71,6 @@ namespace SluiceGate
             } while (isInValidChoice);
             return choice;
         }
+
     }
 }

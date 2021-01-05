@@ -23,7 +23,9 @@ namespace SluiceGate
             {
                 return CanBeAdded.NoCantFit;
             }
+        
             else if ((int)length > (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream))
+
             {
                 return CanBeAdded.NoNotCurrently;
             }
@@ -55,13 +57,13 @@ namespace SluiceGate
             EnterNewShip();
             string path = GlobalVar.PathShipList;
             FileIO.WriteOrdersToFile(path);
-
         }
 
         private static void EnterNewShip()
         {
             Length length = Length.Special;
             Console.WriteLine("What's the shipsname?");
+
             string name = InputName();
             Console.WriteLine("What's the Draft of the ship? (in meters)");
             double draft = InputDraft();
@@ -72,6 +74,7 @@ namespace SluiceGate
             }
 
             Console.WriteLine("What's direction are we going? up? or down? type 1 for up 0 for down");
+
             bool direction = InputDirection();
 
             //return newShip;
@@ -89,7 +92,8 @@ namespace SluiceGate
                                         $" {(ship.IsUpstream ? "up" : "down")}");
 
                     GlobalVar.ShipList.Add(ship);
-                    GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
+
+                GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
                     Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream} units");
                     Console.ReadKey();
                     break;
@@ -101,7 +105,8 @@ namespace SluiceGate
 
                 case CanBeAdded.NoNotCurrently:
                     Console.WriteLine($"Sorry this ship can't safely enter the sluice.Already {GlobalVar.ShipList.Count} lists in Sluice" +
-                        $" for a total length of {30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
+
+                                      $" for a total length of {30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
                     Console.ReadKey();
                     break;
 
@@ -109,6 +114,7 @@ namespace SluiceGate
                     throw new Exception();
             }
         }
+
 
         private static string InputName()
         {
@@ -175,6 +181,7 @@ namespace SluiceGate
             return draft;
 
         }
+
 
         private static Length InputLength()
         {
