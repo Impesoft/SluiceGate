@@ -84,32 +84,37 @@ namespace SluiceGate
             if (!IsDraftOK(draft))
             {
                 Console.WriteLine("ship's draft is too deep");
-                FileIO.WriteToLog($"Ship refused {name} reason: Shift's draft too deep ({draft} > 2.75m).");
+                FileIO.WriteToLog($"Ship {name} refused reason: Ship's draft too deep ({draft} > 2.75m).");
                 return;
             }
 
             Console.WriteLine("What's direction are we going? up? or down? type 1 for up 0 for down");
 
-            bool direction = InputDirection();
+            bool isUpstream = InputDirection();
 
             //return newShip;
 
             Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
             length = InputLength();
-            CanBeAdded canBeAdded = CheckLength(length, direction);
+            CanBeAdded canBeAdded = CheckLength(length, isUpstream);
             switch (canBeAdded)
             {
                 case CanBeAdded.Yes:
-                    Ship ship = new Ship(name, length, draft, direction);
-
-                    Console.WriteLine(@$"ship arrived at {ship.ArrivalTime} was ship {ship.Name} which is a" +
-                                        $" {ship.Length} size ship and has a draft of {Math.Round(ship.Draft * 39.3701, 2)}inch going " +
-                                        $" {(ship.IsUpstream ? "up" : "down")}");
+                    Ship ship = new Ship(name, length, draft, isUpstream);
+                    FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
+                                        $" {ship.Length} sized ship with a draft of {Math.Round(ship.Draft * 39.3701, 2)}inch going " +
+                                        $" {(ship.IsUpstream ? "upstream" : "downstream")}");
 
                     GlobalVar.ShipList.Add(ship);
-
-                    GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
-                    Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - (direction ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)} units");
+                    if (isUpstream)
+                    {
+                        GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
+                    }
+                    else
+                    {
+                        GlobalVar.LengthShipsInSluiceDownStream += (int)ship.Length;
+                    }
+                    Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)} units");
                     Console.ReadKey();
                     break;
 
@@ -119,9 +124,19 @@ namespace SluiceGate
                     break;
 
                 case CanBeAdded.NoNotCurrently:
-                    Console.WriteLine($"Sorry this ship can't safely enter the sluice.Already {GlobalVar.ShipList.Count} lists in Sluice" +
+                    if (isUpstream)
+                    {
+                        Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
+                            $"{30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
+                        FileIO.WriteToLog($"Ship {name} refused reason: Ship too long for current upstreamcue({30 * GlobalVar.LengthShipsInSluiceUpStream}m).");
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
+                            $"{30 * GlobalVar.LengthShipsInSluiceDownStream} meters");
+                        FileIO.WriteToLog($"Ship {name} refused reason: Ship too long for current downstreamcue({30 * GlobalVar.LengthShipsInSluiceDownStream}m).");
+                    }
 
-                                      $" for a total length of {30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
                     Console.ReadKey();
                     break;
 
@@ -133,7 +148,7 @@ namespace SluiceGate
         private string InputName()
         {
             string name = "";
-            bool isValidName = false;
+            bool isValidName;
             do
             {
                 Console.CursorTop = 3;
