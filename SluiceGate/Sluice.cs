@@ -145,7 +145,7 @@ namespace SluiceGate
                     }
                     int spaceLeftInSluice = GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
 
-                    Console.WriteLine($"space left in sluice {spaceLeftInSluice * 30}m");
+                    Console.WriteLine($"space left in {(isUpstream ? "upstream" : "downstream")} cue {spaceLeftInSluice * 30}m");
                     break;
 
                 case CanBeAdded.NoNotCurrently:
@@ -307,7 +307,7 @@ namespace SluiceGate
                     {
                         Console.CursorTop = b;
                         Console.CursorLeft = 0;
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.Blue;
                         Console.Write("~~~~");
                     }
                     Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -336,7 +336,7 @@ namespace SluiceGate
                     {
                         Console.CursorTop = a;
                         Console.CursorLeft = 0;
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+
                         if (i > 0)
                         {
                             Console.Write("     ");
@@ -346,14 +346,14 @@ namespace SluiceGate
                     {
                         Console.CursorTop = b;
                         Console.CursorLeft = 0;
-                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.ForegroundColor = ConsoleColor.Blue;
                         Console.Write("~~~~~");
                     }
                     Console.ForegroundColor = ConsoleColor.DarkGray;
                     Console.CursorTop = 0;
                     Console.CursorLeft = 5;
 
-                    Console.WriteLine($"Decreasing water Level. Sluice is {GlobalVar.SluiceState}     ");
+                    Console.WriteLine($"Increasing water Level. Sluice is {GlobalVar.SluiceState}     ");
                     System.Threading.Thread.Sleep(500);
                     GlobalVar.SluiceState = StateOfSluice.EnRoute;
                 }
