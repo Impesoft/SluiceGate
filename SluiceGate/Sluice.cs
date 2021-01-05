@@ -322,6 +322,15 @@ namespace SluiceGate
                 Console.CursorTop = 0;
                 Console.CursorLeft = 5;
                 GlobalVar.SluiceState = StateOfSluice.Down;
+                if (GlobalVar.ShipsInStream[0].Count > 0)
+                {
+                    foreach (Ship ship in GlobalVar.ShipsInStream[0])
+                    {
+                        FileIO.WriteToLog($"ship {ship.Name} left sluice at {DateTime.Now} " +
+                                               $" {ship.Length} sized ship with draft {100 * Math.Round(ship.Draft),2}cm left " +
+                                               $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
+                    }
+                }
                 GlobalVar.ShipsInStream[0].Clear();
                 GlobalVar.LengthShipsInSluiceDownStream = 0;
                 Console.WriteLine($"                        Sluice is {GlobalVar.SluiceState}     ");
@@ -361,6 +370,15 @@ namespace SluiceGate
                 Console.CursorTop = 0;
                 Console.CursorLeft = 5;
                 GlobalVar.SluiceState = StateOfSluice.Up;
+                if (GlobalVar.ShipsInStream[1].Count > 0)
+                {
+                    foreach (Ship ship in GlobalVar.ShipsInStream[1])
+                    {
+                        FileIO.WriteToLog($"ship {ship.Name} left sluice at {DateTime.Now} " +
+                                               $" {ship.Length} sized ship with draft {100 * Math.Round(ship.Draft),2}cm left " +
+                                               $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
+                    }
+                }
                 GlobalVar.ShipsInStream[1].Clear();
 
                 GlobalVar.LengthShipsInSluiceUpStream = 0;
