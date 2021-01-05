@@ -18,4 +18,11 @@ namespace SluiceGate
         EnRoute = 2,
         Down = 3
     };
+    public enum CanBeAdded
+    {
+        Yes = 0,
+        NoCantFit = 1,
+        NoNotCurrently =2
+
+    }
 }

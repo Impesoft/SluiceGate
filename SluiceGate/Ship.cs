@@ -4,45 +4,62 @@ using System.Text;
 
 namespace SluiceGate
 {
-    class Ship
+    public class Ship
     {
 
         private int id;
         public string Name { get; set; }
-        public int Length {
-            get 
+        public Length Length
+        {
+            get
             {
                 return length;
             }
             set
             {
-                if (value > 4) { length = 4; } else if (value < 1 ) { length = 1; }
-            } 
+                if (value < Length.Small) { length = Length.Small; } else { length = value; }
+            }
         }
-        private int length;
-        private DateTime arrivalTime = DateTime.Now;
-        public double Draft { get; set; }
+        private Length length;
+        public DateTime ArrivalTime = DateTime.Now;
+        public double Draft
+        {
+            get
+            {
+                return draft;
+            }
+            set
+            {
+                if (value < 0.25) { draft = 0.25; } else { draft = value; }
+            }
+        }
+
+
+
         private double draft;
-        public bool Direction { get; set; }
-        public Ship()
+        public bool IsUpstream { get; set; }
+        public Ship() //constructor no arguments
         {
             id++;
             Name = "Not Set";
-            Length = 2;
-            arrivalTime = DateTime.Now;
+            Length = (Length)2;
+            ArrivalTime = DateTime.Now;
             Draft = 1.75;
-            Direction = true; // true is up (bruikbaar voor tol te betalen)
+            IsUpstream = true; // true is up (bruikbaar voor tol te betalen)
 
         }
-        public Ship(string name, int length, double draft, bool direction )
+        public Ship(string name, Length length, double draft, bool direction) // constructor with arguments
         {
             id++;
             Name = name;
-            Length = length;
-            arrivalTime = DateTime.Now;
+            Length = (Length)length;
+            ArrivalTime = DateTime.Now;
             Draft = draft;
-            Direction = direction; // true is up (bruikbaar voor tol te betalen)
+            IsUpstream = direction; // true is up (bruikbaar voor tol te betalen)
 
         }
     }
+ 
 }
+
+
