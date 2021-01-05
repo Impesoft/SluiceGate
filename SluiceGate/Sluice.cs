@@ -45,6 +45,25 @@ namespace SluiceGate
             }
         }
 
+        internal void ViewShips()
+        {
+            Console.Clear();
+            if (GlobalVar.ShipList.Count > 0)
+            {
+                foreach (Ship ship in GlobalVar.ShipList)
+                {
+                    Console.WriteLine($"arrived and added in sluice at {ship.ArrivalTime}" +
+                        $" name:{ship.Name} length:{(int)ship.Length * 30}m going {(ship.IsUpstream ? "upstream" : "downstream")}");
+                }
+            }
+            else
+            {
+                Console.WriteLine("The Shiplist is currently empty.");
+            }
+            Console.WriteLine("press any key to return to the menu");
+            Console.ReadKey();
+        }
+
         public void AddShips()
         {
             bool keeprunning;
@@ -111,8 +130,8 @@ namespace SluiceGate
                 case CanBeAdded.Yes:
                     Ship ship = new Ship(name, length, draft, isUpstream);
                     FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
-                                        $" {ship.Length} sized ship with a draft of {10 * Math.Round(ship.Draft),2}cm going " +
-                                        $" {(ship.IsUpstream ? "upstream" : "downstream")}.");
+                                        $" {ship.Length} sized ship with a draft of {100 * Math.Round(ship.Draft),2}cm going " +
+                                        $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
 
                     GlobalVar.ShipList.Add(ship);
                     GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
