@@ -34,11 +34,7 @@ namespace SluiceGate
 
         public CanBeAdded CheckLength(Length length, bool direction)
         {
-            if ((int)length > GlobalVar.SluiceLength)
-            {
-                return CanBeAdded.NoCantFit;
-            }
-            else if ((int)length > (GlobalVar.SluiceLength - (direction ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)))
+            if ((int)length > (GlobalVar.SluiceLength - (direction ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)))
 
             {
                 return CanBeAdded.NoNotCurrently;
@@ -60,10 +56,20 @@ namespace SluiceGate
                 Console.WriteLine("Welcome to our Sluice");
 
                 InputShip();
-                Console.WriteLine("add another ship? or Quit? enter Q for quit or any other key to continue");
 
-                keeprunning = char.ToUpper(Console.ReadKey().KeyChar) != 'Q';
+                if ((GlobalVar.SluiceLength - ((GlobalVar.SluiceState == StateOfSluice.Down) ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)) > 0)
+                {
+                    Console.WriteLine("add another ship or (S)end sluice enroute? (S to send enroute)");
+                    keeprunning = char.ToUpper(Console.ReadKey().KeyChar) != 'S';
+                }
+                else
+                {
+                    Console.WriteLine("Sluice Full changing Direction");
+                    // Thread.Sleep(2000);
+                    keeprunning = false;
+                }
             } while (keeprunning);
+            ChangeSluiceState();
         }
 
         private void InputShip()
@@ -91,8 +97,11 @@ namespace SluiceGate
             Console.WriteLine("What's direction are we going? up? or down? type 1 for up 0 for down");
 
             bool isUpstream = InputDirection();
-
-            //return newShip;
+            if (GlobalVar.SluiceFull[(isUpstream ? 1 : 0)])
+            {
+                Console.WriteLine($"I'm sorry {(isUpstream ? "upstream" : "downstream")} cue is currently full.");
+                return;
+            }
 
             Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
             length = InputLength();
@@ -102,10 +111,11 @@ namespace SluiceGate
                 case CanBeAdded.Yes:
                     Ship ship = new Ship(name, length, draft, isUpstream);
                     FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
-                                        $" {ship.Length} sized ship with a draft of {Math.Round(ship.Draft * 39.3701, 2)}inch going " +
-                                        $" {(ship.IsUpstream ? "upstream" : "downstream")}");
+                                        $" {ship.Length} sized ship with a draft of {10 * Math.Round(ship.Draft),2}cm going " +
+                                        $" {(ship.IsUpstream ? "upstream" : "downstream")}.");
 
                     GlobalVar.ShipList.Add(ship);
+                    GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
                     if (isUpstream)
                     {
                         GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
@@ -114,13 +124,9 @@ namespace SluiceGate
                     {
                         GlobalVar.LengthShipsInSluiceDownStream += (int)ship.Length;
                     }
-                    Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)} units");
-                    Console.ReadKey();
-                    break;
+                    int spaceLeftInSluice = GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
 
-                case CanBeAdded.NoCantFit:
-                    Console.WriteLine($"Ships length is {length} which is longer than the sluice.");
-                    Console.ReadKey();
+                    Console.WriteLine($"space left in sluice {spaceLeftInSluice * 30}m");
                     break;
 
                 case CanBeAdded.NoNotCurrently:
@@ -128,16 +134,16 @@ namespace SluiceGate
                     {
                         Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                             $"{30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
-                        FileIO.WriteToLog($"Ship {name} refused reason: Ship too long for current upstreamcue({30 * GlobalVar.LengthShipsInSluiceUpStream}m).");
+                        FileIO.WriteToLog($"{DateTime.Now}: Ship {name} refused reason: Ship too long for current upstreamcue({30 * GlobalVar.LengthShipsInSluiceUpStream}m).");
                     }
                     else
                     {
                         Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                             $"{30 * GlobalVar.LengthShipsInSluiceDownStream} meters");
-                        FileIO.WriteToLog($"Ship {name} refused reason: Ship too long for current downstreamcue({30 * GlobalVar.LengthShipsInSluiceDownStream}m).");
+                        FileIO.WriteToLog($"{DateTime.Now}: Ship {name} refused reason: Ship too long for current downstreamcue({30 * GlobalVar.LengthShipsInSluiceDownStream}m).");
                     }
 
-                    Console.ReadKey();
+                    System.Threading.Thread.Sleep(2000);
                     break;
 
                 default:
@@ -170,10 +176,13 @@ namespace SluiceGate
         {
             bool isInValidDirection;
             bool direction = true;
+            int top = Console.CursorTop;
             do
             {
-                string userInputDirection = Console.ReadLine();
-
+                Console.CursorLeft = 0;
+                Console.CursorTop = top;
+                string userInputDirection = Console.ReadKey().KeyChar.ToString();
+                Console.WriteLine();
                 if (userInputDirection == "1" || userInputDirection == "0")
                 {
                     direction = Convert.ToBoolean((userInputDirection == "1") ? "True" : "False");
@@ -217,6 +226,8 @@ namespace SluiceGate
 
             do
             {
+                length = Length.Special;
+
                 Console.CursorLeft = 0;
                 Console.Write("                    ");
                 Console.CursorLeft = 0;
@@ -243,14 +254,102 @@ namespace SluiceGate
 
                     default:
                         Console.CursorLeft = 0;
+                        Console.ForegroundColor = ConsoleColor.Red;
                         Console.Write("Invalid Length");
-                        Console.ReadKey();
-                        length = Length.Special;
+                        Console.ResetColor();
+                        System.Threading.Thread.Sleep(500);
                         noValidInput = true;
                         break;
                 }
             } while (noValidInput);
             return length;
+        }
+
+        public void ChangeSluiceState()
+        {
+            Console.Clear();
+            StateOfSluice currentState = GlobalVar.SluiceState;
+            if (currentState == StateOfSluice.Up)
+            {
+                Console.CursorTop = 0;
+                Console.CursorLeft = 5;
+
+                Console.WriteLine($"Decreasing water Level. Sluice is {GlobalVar.SluiceState}     ");
+                for (int i = 0; i <= 5; i++)
+                {
+                    for (int a = 0; a <= i; a++)
+                    {
+                        Console.CursorTop = a;
+                        Console.CursorLeft = 0;
+
+                        Console.Write("    ");
+                    }
+                    for (int b = i; b < 5; b++)
+                    {
+                        Console.CursorTop = b;
+                        Console.CursorLeft = 0;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("~~~~");
+                    }
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.CursorTop = 0;
+                    Console.CursorLeft = 5;
+
+                    Console.WriteLine($"Decreasing water Level. Sluice is {GlobalVar.SluiceState}     ");
+                    System.Threading.Thread.Sleep(500);
+                    GlobalVar.SluiceState = StateOfSluice.EnRoute;
+                }
+                Console.ResetColor();
+                Console.CursorTop = 0;
+                Console.CursorLeft = 5;
+                GlobalVar.SluiceState = StateOfSluice.Down;
+                GlobalVar.ShipsInStream[0].Clear();
+                GlobalVar.LengthShipsInSluiceDownStream = 0;
+                Console.WriteLine($"                        Sluice is {GlobalVar.SluiceState}     ");
+            }
+            else
+            {
+                Console.CursorLeft = 5;
+                Console.WriteLine($"Increasing water Level. Sluice is {GlobalVar.SluiceState}     ");
+                for (int i = 5; i >= 0; i--)
+                {
+                    for (int a = 0; a < i; a++)
+                    {
+                        Console.CursorTop = a;
+                        Console.CursorLeft = 0;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        if (i > 0)
+                        {
+                            Console.Write("     ");
+                        }
+                    }
+                    for (int b = i; b < 5; b++)
+                    {
+                        Console.CursorTop = b;
+                        Console.CursorLeft = 0;
+                        Console.ForegroundColor = ConsoleColor.Cyan;
+                        Console.Write("~~~~~");
+                    }
+                    Console.ForegroundColor = ConsoleColor.DarkGray;
+                    Console.CursorTop = 0;
+                    Console.CursorLeft = 5;
+
+                    Console.WriteLine($"Decreasing water Level. Sluice is {GlobalVar.SluiceState}     ");
+                    System.Threading.Thread.Sleep(500);
+                    GlobalVar.SluiceState = StateOfSluice.EnRoute;
+                }
+                Console.ResetColor();
+                Console.CursorTop = 0;
+                Console.CursorLeft = 5;
+                GlobalVar.SluiceState = StateOfSluice.Up;
+                GlobalVar.ShipsInStream[1].Clear();
+
+                GlobalVar.LengthShipsInSluiceUpStream = 0;
+                Console.WriteLine($"                        Sluice is {GlobalVar.SluiceState}     ");
+                System.Threading.Thread.Sleep(1500);
+
+                Console.Clear();
+            }
         }
     }
 }

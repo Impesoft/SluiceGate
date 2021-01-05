@@ -31,11 +31,11 @@ namespace SluiceGate
 
         public static void WriteToLog(string textToWriteToFile)
         {
-  
             string path = GlobalVar.SluiceLogPath;
             using StreamWriter writer = new StreamWriter(path, true);
             writer.WriteLine(textToWriteToFile);
         }
+
         public static void ClearShipsLogged()
         {
             if (File.Exists(GlobalVar.SluiceLogPath))
@@ -43,11 +43,11 @@ namespace SluiceGate
                 File.Delete(GlobalVar.SluiceLogPath);
             }
         }
+
         public static List<string> ReadShipLogFromFile()
         {
             if (File.Exists(GlobalVar.SluiceLogPath))
             {
-
                 StreamReader reader = new StreamReader(GlobalVar.SluiceLogPath);
                 string line = string.Empty;
 
@@ -64,11 +64,16 @@ namespace SluiceGate
             {
                 List<string> list = new List<string>(new string[] { "empty" });
                 return list;
+            }
+        }
 
-
+        public static void CheckForIOFiles()
+        {
+            if (File.Exists(GlobalVar.PathShipList))
+            {
+                GlobalVar.ShipList = FileIO.ReadShipsFromFile(GlobalVar.PathShipList);
+                //  todo set id to id of last ship in list
             }
         }
     }
 }
-
-
