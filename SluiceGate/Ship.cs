@@ -1,14 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace SluiceGate
 {
     public class Ship
     {
-
         private int id;
         public string Name { get; set; }
+
         public Length Length
         {
             get
@@ -20,8 +18,10 @@ namespace SluiceGate
                 if (value < Length.Small) { length = Length.Small; } else { length = value; }
             }
         }
+
         private Length length;
         public DateTime ArrivalTime = DateTime.Now;
+
         public double Draft
         {
             get
@@ -34,10 +34,9 @@ namespace SluiceGate
             }
         }
 
-
-
         private double draft;
         public bool IsUpstream { get; set; }
+
         public Ship() //constructor no arguments
         {
             id++;
@@ -46,8 +45,8 @@ namespace SluiceGate
             ArrivalTime = DateTime.Now;
             Draft = 1.75;
             IsUpstream = true; // true is up (bruikbaar voor tol te betalen)
-
         }
+
         public Ship(string name, Length length, double draft, bool direction) // constructor with arguments
         {
             id++;
@@ -56,10 +55,6 @@ namespace SluiceGate
             ArrivalTime = DateTime.Now;
             Draft = draft;
             IsUpstream = direction; // true is up (bruikbaar voor tol te betalen)
-
         }
     }
- 
 }
-
-

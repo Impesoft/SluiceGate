@@ -1,19 +1,17 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.IO;
 
 namespace SluiceGate
 {
-    class Program
+    internal class Program
     {
-
         private static void Main(string[] args)
         {
-
+            sluice sluice = sluice.GetSluice();
             if (File.Exists(GlobalVar.PathShipList))
             {
                 GlobalVar.ShipList = FileIO.ReadShipsFromFile(GlobalVar.PathShipList);
-                //  todo set id to ID of last ship in list
+                //  todo set id to id of last ship in list
             }
 
             //base menu
@@ -32,8 +30,9 @@ namespace SluiceGate
                 switch (ManagersChoice)
                 {
                     case '1':
-                        Sluice.AddShips();
+                        sluice.AddShips();
                         break;
+
                     case '2':
                         Console.Clear();
                         foreach (Ship ship in GlobalVar.ShipList)
@@ -48,12 +47,12 @@ namespace SluiceGate
                     case 'Q':
                         quit = true;
                         break;
+
                     default:
                         break;
                 }
             } while (!quit);
             Console.Clear();
- 
         }
 
         private static char InputManagersChoice()
@@ -64,14 +63,12 @@ namespace SluiceGate
             {
                 Console.CursorLeft = 0;
                 choice = Char.ToUpper(Console.ReadKey().KeyChar);
-                if (choice == '1' ||choice == '2' ||choice == '3' || choice == '4' || choice == 'Q')
+                if (choice == '1' || choice == '2' || choice == '3' || choice == '4' || choice == 'Q')
                 {
                     isInValidChoice = false;
-                }  
-
+                }
             } while (isInValidChoice);
             return choice;
         }
-
     }
 }

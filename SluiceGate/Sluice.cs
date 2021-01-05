@@ -2,29 +2,43 @@
 
 namespace SluiceGate
 {
-    internal static class Sluice
+    internal class sluice
     {
-        public static int GetStateOfSluice()
+        private static sluice instance;
+
+        private sluice()
+        {
+        }
+
+        public static sluice GetSluice()
+        {
+            if (instance == null)
+            {
+                instance = new sluice();
+            }
+            return instance;
+        }
+
+        public int GetStateOfSluice()
         {
             int sluice = 0;
             return sluice;
         }
 
-        public static bool IsDraftOK(double draft)
+        public bool IsDraftOK(double draft)
         {
             bool draftIsOk = true;
             if (draft > 2.75) draftIsOk = false;
             return draftIsOk;
         }
 
-        public static CanBeAdded CheckLength(Length length)
+        public CanBeAdded CheckLength(Length length, bool direction)
         {
             if ((int)length > GlobalVar.SluiceLength)
             {
                 return CanBeAdded.NoCantFit;
             }
-        
-            else if ((int)length > (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream))
+            else if ((int)length > (GlobalVar.SluiceLength - (direction ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)))
 
             {
                 return CanBeAdded.NoNotCurrently;
@@ -35,7 +49,7 @@ namespace SluiceGate
             }
         }
 
-        public static void AddShips()
+        public void AddShips()
         {
             bool keeprunning;
 
@@ -52,14 +66,14 @@ namespace SluiceGate
             } while (keeprunning);
         }
 
-        private static void InputShip()
+        private void InputShip()
         {
             EnterNewShip();
             string path = GlobalVar.PathShipList;
-            FileIO.WriteOrdersToFile(path);
+            FileIO.WriteShipsToFile(path);
         }
 
-        private static void EnterNewShip()
+        private void EnterNewShip()
         {
             Length length = Length.Special;
             Console.WriteLine("What's the shipsname?");
@@ -70,6 +84,7 @@ namespace SluiceGate
             if (!IsDraftOK(draft))
             {
                 Console.WriteLine("ship's draft is too deep");
+                FileIO.WriteToLog($"Ship refused {name} reason: Shift's draft too deep ({draft} > 2.75m).");
                 return;
             }
 
@@ -81,20 +96,20 @@ namespace SluiceGate
 
             Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
             length = InputLength();
-            CanBeAdded canBeAdded = CheckLength(length);
+            CanBeAdded canBeAdded = CheckLength(length, direction);
             switch (canBeAdded)
             {
                 case CanBeAdded.Yes:
                     Ship ship = new Ship(name, length, draft, direction);
 
-                    Console.WriteLine($"ship arrived at {ship.ArrivalTime} was ship {ship.Name} which is a" +
+                    Console.WriteLine(@$"ship arrived at {ship.ArrivalTime} was ship {ship.Name} which is a" +
                                         $" {ship.Length} size ship and has a draft of {Math.Round(ship.Draft * 39.3701, 2)}inch going " +
                                         $" {(ship.IsUpstream ? "up" : "down")}");
 
                     GlobalVar.ShipList.Add(ship);
 
-                GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
-                    Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream} units");
+                    GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
+                    Console.WriteLine($"space left in sluice {GlobalVar.SluiceLength - (direction ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)} units");
                     Console.ReadKey();
                     break;
 
@@ -115,19 +130,20 @@ namespace SluiceGate
             }
         }
 
-
-        private static string InputName()
+        private string InputName()
         {
-            string name="";
+            string name = "";
             bool isValidName = false;
             do
             {
                 Console.CursorTop = 3;
                 string inputName = Console.ReadLine();
-                if (inputName.Length<1)
+                if (inputName.Length < 1)
                 {
                     isValidName = false;
-                } else { 
+                }
+                else
+                {
                     isValidName = true;
                     name = inputName;
                 }
@@ -135,10 +151,10 @@ namespace SluiceGate
             return name;
         }
 
-        private static bool InputDirection()
+        private bool InputDirection()
         {
             bool isInValidDirection;
-            bool direction=true;
+            bool direction = true;
             do
             {
                 string userInputDirection = Console.ReadLine();
@@ -156,14 +172,13 @@ namespace SluiceGate
             } while (isInValidDirection);
 
             return direction;
-
         }
 
-        private static double InputDraft()
+        private double InputDraft()
         {
             double draft = 0.0;
             bool noValidDraft;
-                       do
+            do
             {
                 string input = Console.ReadLine();
                 try
@@ -175,15 +190,12 @@ namespace SluiceGate
                 {
                     Console.WriteLine("Input not valid");
                     noValidDraft = true;
-
                 }
             } while (noValidDraft);
             return draft;
-
         }
 
-
-        private static Length InputLength()
+        private Length InputLength()
         {
             Length length;
             bool noValidInput;
@@ -205,13 +217,13 @@ namespace SluiceGate
                     case 'M':
                         length = Length.Medium;
                         Console.WriteLine("edium");
-                        noValidInput = false; 
+                        noValidInput = false;
                         break;
 
                     case 'L':
                         length = Length.Long;
                         Console.WriteLine("ong");
-                        noValidInput = false; 
+                        noValidInput = false;
                         break;
 
                     default:
@@ -219,7 +231,7 @@ namespace SluiceGate
                         Console.Write("Invalid Length");
                         Console.ReadKey();
                         length = Length.Special;
-                        noValidInput = true; 
+                        noValidInput = true;
                         break;
                 }
             } while (noValidInput);
