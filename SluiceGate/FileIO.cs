@@ -47,6 +47,32 @@ namespace SluiceGate
                 File.Delete(GlobalVar.SluiceLogPath);
             }
         }
+        public static List<string> ReadShipLogFromFile()
+        {
+            if (File.Exists(GlobalVar.SluiceLogPath))
+            {
 
+                StreamReader reader = new StreamReader(GlobalVar.SluiceLogPath);
+                string line = string.Empty;
+
+                List<string> lines = new List<string>();
+
+                while ((line = reader.ReadLine()) != null)
+                {
+                    lines.Add(line);
+                }
+                reader.Close();
+                return lines;
+            }
+            else
+            {
+                List<string> list = new List<string>(new string[] { "empty" });
+                return list;
+
+
+            }
+        }
     }
 }
+
+

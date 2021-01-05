@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 
 namespace SluiceGate
@@ -43,8 +44,23 @@ namespace SluiceGate
                         Console.WriteLine("press any key to return to the menu");
                         Console.ReadKey();
                         break;
+                    case '3':
+                        Console.Clear();
+                        List<string> log = FileIO.ReadShipLogFromFile();
+                        if (log[0]=="empty") 
+                        {
+                            Console.WriteLine("The log is empty.");
+                        } else
+                        {
+                            foreach (string item in log)
+                            {
+                                Console.WriteLine(item.ToString());
+                            }
 
-
+                        }
+                        Console.WriteLine("press any key to go back to the main menu");
+                        Console.ReadKey();
+                        break;
 
                     case '4':
                         FileIO.ClearShipsLogged();
