@@ -112,7 +112,7 @@ namespace SluiceGate
                     Ship ship = new Ship(name, length, draft, isUpstream);
                     FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
                                         $" {ship.Length} sized ship with a draft of {10 * Math.Round(ship.Draft),2}cm going " +
-                                        $" {(ship.IsUpstream ? "upstream" : "downstream")}.");
+                                        $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
 
                     GlobalVar.ShipList.Add(ship);
                     GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
