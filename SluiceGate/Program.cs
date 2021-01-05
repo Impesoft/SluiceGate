@@ -44,6 +44,13 @@ namespace SluiceGate
                         Console.ReadKey();
                         break;
 
+
+
+                    case '4':
+                        FileIO.ClearShipsLogged();
+                        Console.WriteLine("Log Cleared, Press any key to return to the main menu");
+                        Console.ReadKey();
+                        break;
                     case 'Q':
                         quit = true;
                         break;

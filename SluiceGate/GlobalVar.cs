@@ -10,7 +10,7 @@ namespace SluiceGate
         // Set required doc paths
         public static string PathShipList = $"{documents}\\ShipList.xml";
 
-        public static string SluiceLogPath = $"{documents}\\ShipsLogged.xml";
+        public static string SluiceLogPath = $"{documents}\\ShipsLogged.txt";
 
         public static List<Ship> ShipList = new List<Ship>();
         public static int Id;

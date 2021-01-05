@@ -40,5 +40,13 @@ namespace SluiceGate
             using StreamWriter writer = new StreamWriter(path, true);
             writer.WriteLine(textToWriteToFile);
         }
+        public static void ClearShipsLogged()
+        {
+            if (File.Exists(GlobalVar.SluiceLogPath))
+            {
+                File.Delete(GlobalVar.SluiceLogPath);
+            }
+        }
+
     }
 }
