@@ -31,11 +31,7 @@ namespace SluiceGate
 
         public static void WriteToLog(string textToWriteToFile)
         {
-            /*
-             * A using statement ensure that an object that uses an unmanaged resource
-             * (like a Windows Api call) goes out of scope if it is no longer used
-             * since unmanaged resources do not go out of scope automatically(identifyable by the IDisposable interface)
-             */
+  
             string path = GlobalVar.SluiceLogPath;
             using StreamWriter writer = new StreamWriter(path, true);
             writer.WriteLine(textToWriteToFile);
