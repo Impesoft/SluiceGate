@@ -41,7 +41,8 @@ namespace SluiceGate
                             Console.WriteLine($"arrived and added in sluice at {ship.ArrivalTime}" +
                                 $" name:{ship.Name} length:{(int)ship.Length * 30}m going {(ship.IsUpstream ? "up" : "down")}");
                         }
-
+                        Console.WriteLine("press any key to return to the menu");
+                        Console.ReadKey();
                         break;
 
                     case 'Q':
