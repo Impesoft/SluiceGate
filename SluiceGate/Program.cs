@@ -12,7 +12,7 @@ namespace SluiceGate
 
             FileIO.CheckForIOFiles();
 
-            Menu.OverView();
+            Menu.MainMenu();
 
             Console.Clear();
         }
