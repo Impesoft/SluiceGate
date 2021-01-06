@@ -5,8 +5,8 @@ namespace SluiceGate
     public class Ship
     {
         private int id;
-        private int toll;
-        public int Toll { get; set; }
+      //  private double toll;
+        public double Toll { get; set; }
         public int Id
         {
             get
@@ -62,7 +62,7 @@ namespace SluiceGate
             ArrivalTime = DateTime.Now;
             Draft = 1.75;
             IsUpstream = true; // true is up (bruikbaar voor tol te betalen)
-            Toll = toll;
+            Toll = 0;
         }
 
         public Ship(string name, Length length, double draft, bool direction, double toll) // constructor with arguments
