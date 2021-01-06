@@ -37,9 +37,10 @@ namespace SluiceGate
         private double draft;
         public bool IsUpstream { get; set; }
 
-        public Ship() //constructor no arguments
+        public Ship() //constructor no arguments for XML parsing
         {
-            id++;
+            GlobalVar.Id++;
+            id = GlobalVar.Id;
             Name = "Not Set";
             Length = (Length)2;
             ArrivalTime = DateTime.Now;
@@ -49,7 +50,8 @@ namespace SluiceGate
 
         public Ship(string name, Length length, double draft, bool direction) // constructor with arguments
         {
-            id++;
+            GlobalVar.Id++;
+            id = GlobalVar.Id;
             Name = name;
             Length = (Length)length;
             ArrivalTime = DateTime.Now;
