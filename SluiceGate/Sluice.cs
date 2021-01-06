@@ -128,7 +128,8 @@ namespace SluiceGate
             switch (canBeAdded)
             {
                 case CanBeAdded.Yes:
-                    Ship ship = new Ship(name, length, draft, isUpstream);
+                     double toll = PayToll(isUpstream, length);
+                    Ship ship = new Ship(name, length, draft, isUpstream, toll);
                     FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
                                         $" {ship.Length} sized ship with a draft of {100 * Math.Round(ship.Draft),2}cm going " +
                                         $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
@@ -215,6 +216,18 @@ namespace SluiceGate
             } while (isInValidDirection);
 
             return direction;
+        }
+
+        public double PayToll(bool isUpstream, Length length)
+        {
+            int toll = 0;
+            if (isUpstream)
+            {
+                toll = (int)length * 5;
+                Console.WriteLine("Toll to Pay: " + toll + " Euro");
+                Console.ReadKey();
+            }
+            return toll;
         }
 
         private double InputDraft()
