@@ -5,6 +5,8 @@ namespace SluiceGate
     public class Ship
     {
         private int id;
+      //  private double toll;
+        public double Toll { get; set; }
         public int Id
         {
             get
@@ -51,24 +53,28 @@ namespace SluiceGate
         private double draft;
         public bool IsUpstream { get; set; }
 
-        public Ship() //constructor no arguments
+        public Ship() //constructor no arguments for XML parsing
         {
-            id++;
+            GlobalVar.Id++;
+            id = GlobalVar.Id;
             Name = "Not Set";
             Length = (Length)2;
             ArrivalTime = DateTime.Now;
             Draft = 1.75;
             IsUpstream = true; // true is up (bruikbaar voor tol te betalen)
+            Toll = 0;
         }
 
-        public Ship(string name, Length length, double draft, bool direction) // constructor with arguments
+        public Ship(string name, Length length, double draft, bool direction, double toll) // constructor with arguments
         {
-            id++;
+            GlobalVar.Id++;
+            id = GlobalVar.Id;
             Name = name;
             Length = (Length)length;
             ArrivalTime = DateTime.Now;
             Draft = draft;
             IsUpstream = direction; // true is up (bruikbaar voor tol te betalen)
+            Toll = toll;
         }
     }
 }
