@@ -259,7 +259,6 @@ namespace SluiceGate
             {
                 toll = (int)length * 5;
                 Console.WriteLine("Toll to Pay: " + toll + " Euro");
-                Console.ReadKey();
             }
             return toll;
         }
@@ -287,53 +286,52 @@ namespace SluiceGate
 
         private Length InputLength()
         {
-            Length length;
-            bool noValidInput;
+            (bool,Length) noValidInput;
             do
             {
-                length = Length.Special;
-                Console.CursorLeft = 0;
-                Console.Write("                    ");
-                Console.CursorLeft = 0;
+                Text.clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
-               noValidInput= CompleteInput(size, length);
-            } while (noValidInput);
-            return length;
+                noValidInput= CompleteInput(size);
+            } while (noValidInput.Item1);
+            return noValidInput.Item2;
         }
 
-        private bool CompleteInput(char size, Length length)
+        private (bool, Length) CompleteInput(char size)
         {
-            bool noValidInput;
+            (bool, Length) noValidInput;
+
             switch (size)
             {
                 case 'S':
-                    length = Length.Small;
+                    noValidInput.Item2 = Length.Small;
                     Console.WriteLine("mall");
-                    noValidInput = false;
+                    noValidInput.Item1 = false;
                     break;
 
                 case 'M':
-                    length = Length.Medium;
+                    noValidInput.Item2 = Length.Medium;
                     Console.WriteLine("edium");
-                    noValidInput = false;
+                    noValidInput.Item1 = false;
                     break;
 
                 case 'L':
-                    length = Length.Long;
+                    noValidInput.Item2 = Length.Long;
                     Console.WriteLine("ong");
-                    noValidInput = false;
+                    noValidInput.Item1 = false;
                     break;
 
                 default:
                     Console.CursorLeft = 0;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Invalid Length");
-                    Console.ResetColor();
+                    Console.ResetColor();                    
+                    noValidInput.Item2 = Length.Special;
+                    noValidInput.Item1 = true;
                     System.Threading.Thread.Sleep(500);
-                    noValidInput = true;
                     break;
             }
             return noValidInput;
+            ;
         }
 
         public void ChangeSluiceState()
@@ -390,14 +388,14 @@ namespace SluiceGate
 
                     if (i > 0)
                     {
-                        Console.Write("     ");
+                        Text.clearline(0);
                     }
                 }
                 for (int b = i; b < 5; b++)
                 {
                     Console.CursorTop = b;
                     Console.CursorLeft = 0;
-                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write("~~~~~");
                 }
                 Console.ForegroundColor = ConsoleColor.DarkGray;
@@ -442,13 +440,13 @@ namespace SluiceGate
                     Console.CursorTop = a;
                     Console.CursorLeft = 0;
 
-                    Console.Write("    ");
+                    Text.clearline(0);
                 }
                 for (int b = i; b < 5; b++)
                 {
                     Console.CursorTop = b;
                     Console.CursorLeft = 0;
-                    Console.ForegroundColor = ConsoleColor.Blue;
+                    Console.ForegroundColor = ConsoleColor.Cyan;
                     Console.Write("~~~~");
                 }
                 Console.ForegroundColor = ConsoleColor.DarkGray;
