@@ -43,7 +43,7 @@ namespace SluiceGate
             Console.WriteLine($"Welcome Sluice Manager  (sluice = {GlobalVar.SluiceState})");
             Console.WriteLine("----------------------\n");
             Console.WriteLine("1) add Ships");
-            Console.WriteLine("2) view ships");
+            Console.WriteLine("2) view ships (and their latest updates)");
             Console.WriteLine("3) view ShipsLog");
             Console.WriteLine("4) clear ShipsLog");
             Console.WriteLine("Q) Quit Application");
