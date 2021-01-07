@@ -58,7 +58,7 @@ namespace SluiceGate
             {
                 foreach (Ship ship in GlobalVar.ShipList)
                 {
-                    Console.WriteLine($"{ship.ArrivalTime}: :{ship.Name} arrived in {(ship.IsUpstream ? "upstream" : "downstream")} sluicecue " +
+                    Console.WriteLine($"{ship.Name} arrived:{ship.ArrivalTime} in {(ship.IsUpstream ? "upstream" : "downstream")}cue " +
                         $" (length:{(int)ship.Length * 30}m draft:{ship.Draft})");
                 }
             }
