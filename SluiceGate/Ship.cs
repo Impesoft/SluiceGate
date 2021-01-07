@@ -38,19 +38,19 @@ namespace SluiceGate
         private Length length;
         public DateTime ArrivalTime = DateTime.Now;
 
-        public double Draft
-        {
-            get
-            {
-                return draft;
-            }
-            set
-            {
-                if (value < 0.25) { draft = 0.25; } else { draft = value; }
-            }
-        }
+        //public double Draft
+        //{
+        //    get
+        //    {
+        //        return draft;
+        //    }
+        //    set
+        //    {
+        //        if (value < 0.25) { draft = 0.25; } else { draft = value; }
+        //    }
+        //}
 
-        private double draft;
+        //private double draft;
         public bool IsUpstream { get; set; }
 
         public Ship() //constructor no arguments for XML parsing
@@ -60,19 +60,19 @@ namespace SluiceGate
             Name = "Not Set";
             Length = (Length)2;
             ArrivalTime = DateTime.Now;
-            Draft = 1.75;
+            //Draft = 1.75;
             IsUpstream = true; // true is up (bruikbaar voor tol te betalen)
             Toll = 0;
         }
 
-        public Ship(string name, Length length, double draft, bool direction, double toll) // constructor with arguments
+        public Ship(string name, Length length,/* double draft,*/ bool direction, double toll) // constructor with arguments
         {
             GlobalVar.Id++;
             id = GlobalVar.Id;
             Name = name;
             Length = (Length)length;
             ArrivalTime = DateTime.Now;
-            Draft = draft;
+            //Draft = draft;
             IsUpstream = direction; // true is up (bruikbaar voor tol te betalen)
             Toll = toll;
         }
