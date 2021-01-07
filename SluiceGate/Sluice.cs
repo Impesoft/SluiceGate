@@ -134,12 +134,13 @@ namespace SluiceGate
                 Ship ship = GetShipInfo(name);
                 //   draft = ship.Draft;
                 length = ship.Length;
-            }
-            else
-            {
                 Console.WriteLine("What's the Draft of the ship? (in meters)");
                 draft = InputDraft();
                 if (IsDraftTooDeep(draft, name)) { return; }
+
+            }
+            else
+            {
 
                 Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
                 length = InputLength();
