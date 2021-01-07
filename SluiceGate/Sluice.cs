@@ -235,12 +235,15 @@ namespace SluiceGate
             {
                 Console.CursorLeft = 0;
                 Console.CursorTop = top;
+                Text.Clearline(0);
                 string userInputDirection = Console.ReadKey().KeyChar.ToString();
                 Console.WriteLine();
                 if (userInputDirection == "1" || userInputDirection == "0")
                 {
                     direction = Convert.ToBoolean((userInputDirection == "1") ? "True" : "False");
                     isInValidDirection = false;
+                    Text.Clearline(-1);
+                    Console.WriteLine((direction ? "Upstream" : "Downstream"));
                 }
                 else
                 {
@@ -289,7 +292,7 @@ namespace SluiceGate
             (bool,Length) noValidInput;
             do
             {
-                Text.clearline(0);
+                Text.Clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
                 noValidInput= CompleteInput(size);
             } while (noValidInput.Item1);
@@ -304,19 +307,22 @@ namespace SluiceGate
             {
                 case 'S':
                     noValidInput.Item2 = Length.Small;
-                    Console.WriteLine("mall");
+                    Text.Clearline(0);
+                    Console.WriteLine("Small");
                     noValidInput.Item1 = false;
                     break;
 
                 case 'M':
                     noValidInput.Item2 = Length.Medium;
-                    Console.WriteLine("edium");
+                    Text.Clearline(0); 
+                    Console.WriteLine("Medium");
                     noValidInput.Item1 = false;
                     break;
 
                 case 'L':
                     noValidInput.Item2 = Length.Long;
-                    Console.WriteLine("ong");
+                    Text.Clearline(0); 
+                    Console.WriteLine("Long");
                     noValidInput.Item1 = false;
                     break;
 
@@ -388,7 +394,7 @@ namespace SluiceGate
 
                     if (i > 0)
                     {
-                        Text.clearline(0);
+                        Text.Clearline(0);
                     }
                 }
                 for (int b = i; b < 5; b++)
@@ -440,7 +446,7 @@ namespace SluiceGate
                     Console.CursorTop = a;
                     Console.CursorLeft = 0;
 
-                    Text.clearline(0);
+                    Text.Clearline(0);
                 }
                 for (int b = i; b < 5; b++)
                 {

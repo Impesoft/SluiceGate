@@ -6,9 +6,9 @@ namespace SluiceGate
 {
     class Text
     {
-        public static void clearline(int relativeY)
+        public static void Clearline(int relativeY)
         {
-            int intendedY = Console.CursorTop - relativeY;
+            int intendedY = Console.CursorTop + relativeY;
             if (intendedY<0) { intendedY = 0; }
             if (intendedY>Console.WindowHeight) { intendedY = Console.WindowHeight; }
             Console.SetCursorPosition(0, intendedY);
