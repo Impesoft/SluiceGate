@@ -2,7 +2,6 @@
 {
     public enum Length
     {
-        Special = 0,
         Small = 1,
         Medium = 2,
         Long = 3,
