@@ -33,7 +33,7 @@ namespace SluiceGate
             {
                 draftIsNotOk = true;
                 Console.WriteLine("ship's draft is too deep");
-                FileIO.WriteToLog($"Ship {name} refused reason: Ship's draft too deep ({draft} > 2.75m).");
+                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship's draft too deep ({draft} > 2.75m).");
             }
             return draftIsNotOk;
         }
@@ -58,8 +58,8 @@ namespace SluiceGate
             {
                 foreach (Ship ship in GlobalVar.ShipList)
                 {
-                    Console.WriteLine($"arrived and added in sluice at {ship.ArrivalTime}" +
-                        $" name:{ship.Name} length:{(int)ship.Length * 30}m going {(ship.IsUpstream ? "upstream" : "downstream")}");
+                    Console.WriteLine($"{ship.Name} arrived:{ship.ArrivalTime} in {(ship.IsUpstream ? "upstream" : "downstream")}cue " +
+                        $" (length:{(int)ship.Length * 30}m)"); // draft:{ship.Draft})");
                 }
             }
             else
@@ -106,7 +106,11 @@ namespace SluiceGate
         private void HelloManager()
         {
             Console.Clear();
-            Console.WriteLine($"Welcome Sluice Manager (sluice={GlobalVar.SluiceState})");
+            bool sluiceUp = (GlobalVar.SluiceState == StateOfSluice.Up);
+            int indexSluice = Convert.ToInt32(!sluiceUp);
+            int spaceLeft = GlobalVar.SluiceLength - (!sluiceUp ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
+            Console.WriteLine($"Welcome Sluice Manager (sluice = {GlobalVar.SluiceState} " +
+                $"{(GlobalVar.ShipsInStream[indexSluice].Count)} ships in {(!sluiceUp ? "upstream" : "downstream")}cue {spaceLeft * 30}m left)");
             Console.WriteLine("----------------------");
         }
 
@@ -120,78 +124,109 @@ namespace SluiceGate
         private void EnterNewShip()
         {
             Length length;// = Length.Special;
+            double draft;
             Console.WriteLine("What's the shipsname?");
             string name = InputName();
+            bool toUpdate = false;
             if ((GlobalVar.ShipList.Any(ship => ship.Name == name)))
             {
-                Console.WriteLine("ship already in database.");
-                System.Threading.Thread.Sleep(2000);
-                return;
+                toUpdate = true;
+                Ship ship = GetShipInfo(name);
+                //   draft = ship.Draft;
+                length = ship.Length;
             }
+            else
+            {
+                Console.WriteLine("What's the Draft of the ship? (in meters)");
+                draft = InputDraft();
+                if (IsDraftTooDeep(draft, name)) { return; }
 
-            Console.WriteLine("What's the Draft of the ship? (in meters)");
-            double draft = InputDraft();
-            if (IsDraftTooDeep(draft, name)) { return; }
-
+                Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
+                length = InputLength();
+            }
             Console.WriteLine("Going? up? or down? type 1 for up, 0 for down");
             bool isUpstream = InputDirection();
             if (IsSluiceFull(isUpstream)) { return; }
-
-            Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
-            length = InputLength();
             CanBeAdded canBeAdded = CheckLength(length, isUpstream);
-
             switch (canBeAdded)
             {
                 case CanBeAdded.Yes:
-                    AddShip(name, length, draft, isUpstream);
+                    if (toUpdate) { UpdateShip(name, length, /*draft,*/ isUpstream); }
+                    else { AddShip(name, length, /*draft,*/ isUpstream); }
                     break;
+
                 case CanBeAdded.NoNotCurrently:
-                    CantBeAddedAtThisTime(name, isUpstream);
+                    CantBeAddedAtThisTime(name, isUpstream, length);
                     break;
             }
         }
 
-        private void CantBeAddedAtThisTime(string name, bool isUpstream)
+        private Ship GetShipInfo(string name)
+        {
+            Ship ship = GlobalVar.ShipList.FirstOrDefault(ship => ship.Name == name);
+
+            Console.WriteLine("ship already in database. reading info");
+            System.Threading.Thread.Sleep(2000);
+            Text.Clearline(-1);
+            return ship;
+        }
+
+        private void CantBeAddedAtThisTime(string name, bool isUpstream, Length length)
         {
             if (isUpstream)
             {
                 Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                     $"{30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
-                FileIO.WriteToLog($"{DateTime.Now}: Ship {name} refused reason: Ship too long for current upstreamcue({30 * GlobalVar.LengthShipsInSluiceUpStream}m).");
+                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current upstreamcue" +
+                    $"(ship={30 * (int)length}m only {30 * (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream)}m left).");
             }
             else
             {
                 Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                     $"{30 * GlobalVar.LengthShipsInSluiceDownStream} meters");
-                FileIO.WriteToLog($"{DateTime.Now}: Ship {name} refused reason: Ship too long for current downstreamcue({30 * GlobalVar.LengthShipsInSluiceDownStream}m).");
+                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current downstreamcue" +
+                    $"(ship={30 * (int)length}m only {30 * (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceDownStream)}m left).");
             }
 
             System.Threading.Thread.Sleep(2000);
         }
 
-        private void AddShip(string name, Length length, double draft, bool isUpstream)
+        private void UpdateShip(string name, Length length, /*double draft,*/ bool isUpstream)
         {
             double toll = PayToll(isUpstream, length);
-            Ship ship = new Ship(name, length, draft, isUpstream, toll);
-            FileIO.WriteToLog($"ship {ship.Name} arrived at {ship.ArrivalTime} which is a" +
-                                $" {ship.Length} sized ship with a draft of {100 * Math.Round(ship.Draft),2}cm going " +
-                                $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
-            {
-                GlobalVar.ShipList.Add(ship);
-                GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
-                if (isUpstream)
-                {
-                    GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
-                }
-                else
-                {
-                    GlobalVar.LengthShipsInSluiceDownStream += (int)ship.Length;
-                }
-                int spaceLeftInSluice = GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
+            Ship ship = new Ship(name, length, /*draft,*/ isUpstream, toll);
+            FileIO.WriteToLog($"{ship.ArrivalTime}: ship {ship.Name} arrived (size:" +
+                                $" {ship.Length}) going " +
+                                $"{(ship.IsUpstream ? "upstream" : "downstream")}."); // , draft:{100 * Math.Round(draft),2}cm
+            AddInLocalUpStream(isUpstream, ship);
+        }
 
-                Console.WriteLine($"space left in {(isUpstream ? "upstream" : "downstream")} cue {spaceLeftInSluice * 30}m");
+        private void AddShip(string name, Length length, /*double draft,*/ bool isUpstream)
+        {
+            double toll = PayToll(isUpstream, length);
+            Ship ship = new Ship(name, length, /* draft,*/ isUpstream, toll);
+            FileIO.WriteToLog($"{ship.ArrivalTime}: ship {ship.Name} arrived (size:" +
+                                $" {ship.Length}) going " +
+                                $"{(ship.IsUpstream ? "upstream" : "downstream")}."); // , draft:{100 * Math.Round(draft),2}cm
+
+            GlobalVar.ShipList.Add(ship);
+            AddInLocalUpStream(isUpstream, ship);
+        }
+
+        private void AddInLocalUpStream(bool isUpstream, Ship ship)
+        {
+            GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
+            if (isUpstream)
+            {
+                GlobalVar.LengthShipsInSluiceUpStream += (int)ship.Length;
             }
+            else
+            {
+                GlobalVar.LengthShipsInSluiceDownStream += (int)ship.Length;
+            }
+            int spaceLeftInSluice = GlobalVar.SluiceLength - (isUpstream ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
+
+            Console.WriteLine($"space left in {(isUpstream ? "upstream" : "downstream")} cue {spaceLeftInSluice * 30}m");
         }
 
         private bool IsSluiceFull(bool isUpstream)
@@ -289,12 +324,12 @@ namespace SluiceGate
 
         private Length InputLength()
         {
-            (bool,Length) noValidInput;
+            (bool, Length) noValidInput;
             do
             {
                 Text.Clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
-                noValidInput= CompleteInput(size);
+                noValidInput = CompleteInput(size);
             } while (noValidInput.Item1);
             return noValidInput.Item2;
         }
@@ -314,14 +349,14 @@ namespace SluiceGate
 
                 case 'M':
                     noValidInput.Item2 = Length.Medium;
-                    Text.Clearline(0); 
+                    Text.Clearline(0);
                     Console.WriteLine("Medium");
                     noValidInput.Item1 = false;
                     break;
 
                 case 'L':
                     noValidInput.Item2 = Length.Long;
-                    Text.Clearline(0); 
+                    Text.Clearline(0);
                     Console.WriteLine("Long");
                     noValidInput.Item1 = false;
                     break;
@@ -330,7 +365,7 @@ namespace SluiceGate
                     Console.CursorLeft = 0;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Invalid Length");
-                    Console.ResetColor();                    
+                    Console.ResetColor();
                     noValidInput.Item2 = Length.Special;
                     noValidInput.Item1 = true;
                     System.Threading.Thread.Sleep(500);
@@ -371,9 +406,9 @@ namespace SluiceGate
             {
                 foreach (Ship ship in GlobalVar.ShipsInStream[1])
                 {
-                    FileIO.WriteToLog($"ship {ship.Name} left sluice at {DateTime.Now} " +
-                                           $" {ship.Length} sized ship with draft {100 * Math.Round(ship.Draft),2}cm left " +
-                                           $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
+                    FileIO.WriteToLog($"{DateTime.Now}: ship {ship.Name} left sluice (size:" +
+                                           $" {ship.Length}) leaving " +
+                                           $"{(ship.IsUpstream ? "upstream" : "downstream")}."); // ,  draft:{100 * Math.Round(ship.Draft),2}cm
                 }
             }
             GlobalVar.ShipsInStream[1].Clear();
@@ -424,9 +459,9 @@ namespace SluiceGate
             {
                 foreach (Ship ship in GlobalVar.ShipsInStream[0])
                 {
-                    FileIO.WriteToLog($"ship {ship.Name} left sluice at {DateTime.Now} " +
-                                           $" {ship.Length} sized ship with draft {100 * Math.Round(ship.Draft),2}cm left " +
-                                           $"{(ship.IsUpstream ? "upstream" : "downstream")}.");
+                    FileIO.WriteToLog($"{DateTime.Now}: ship {ship.Name} left sluice (size:" +
+                                           $" {ship.Length}) leaving " +
+                                           $"{(ship.IsUpstream ? "upstream" : "downstream")}."); //, draft:{100 * Math.Round(ship.Draft),2}cm
                 }
             }
             GlobalVar.ShipsInStream[0].Clear();
