@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace SluiceGate
@@ -145,9 +146,19 @@ namespace SluiceGate
                 Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
                 length = InputLength();
             }
+ 
             Console.WriteLine("Going? up? or down? type 1 for up, 0 for down");
             bool isUpstream = InputDirection();
             if (IsSluiceFull(isUpstream)) { return; }
+            Console.WriteLine("what is your cargo?");
+            string cargo = Cargo();
+            if (HasGasOrExplosivesOrFlammable(cargo))
+            {
+                double toll = PayToll(isUpstream, length) + 7;
+                Console.WriteLine($"Special cargo: Toll is now {toll}");
+                System.Threading.Thread.Sleep(2000);
+                return;
+            }
             CanBeAdded canBeAdded = CheckLength(length, isUpstream);
             switch (canBeAdded)
             {
@@ -161,7 +172,16 @@ namespace SluiceGate
                     break;
             }
         }
-
+        private string Cargo()
+        {
+            return Console.ReadLine();
+        }
+        private bool HasGasOrExplosivesOrFlammable(string cargo)
+        {
+            List<string> listOfStrings = new List<string> { "GAS", "EXPLOSIVES", "FLAMMABLE" };
+            bool hasGasOrExplosivesOrFlammable = listOfStrings.Any(cargo.ToUpper().Contains);
+            return hasGasOrExplosivesOrFlammable;
+        }
         private Ship GetShipInfo(string name)
         {
             Ship ship = GlobalVar.ShipList.FirstOrDefault(ship => ship.Name == name);
