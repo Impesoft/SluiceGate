@@ -28,6 +28,9 @@ namespace SluiceGate
                     case '4':
                         ClearShipsLog();
                         break;
+                    case '5':
+                        sluice.ChangeSluiceState();
+                        break;
                     case 'Q':
                         quit = true;
                         break;
@@ -40,13 +43,19 @@ namespace SluiceGate
         private static void ShowMenu()
         {
             Console.Clear();
-            Console.WriteLine($"Welcome Sluice Manager  (sluice = {GlobalVar.SluiceState})");
+            bool sluiceUp = (GlobalVar.SluiceState == StateOfSluice.Up);
+            int indexSluice = Convert.ToInt32(sluiceUp);
+            Console.WriteLine($"Welcome Sluice Manager  [sluice = {GlobalVar.SluiceState} (" +
+                $"{(GlobalVar.ShipsInStream[indexSluice].Count)} ships in {(sluiceUp ? "upstream" : "downstream")}cue / " +
+                $"{(GlobalVar.ShipsInStream[1-indexSluice].Count)} ships in {(!sluiceUp ? "upstream" : "downstream")}cue)]");
             Console.WriteLine("----------------------\n");
             Console.WriteLine("1) add Ships");
             Console.WriteLine("2) view ships (and their latest updates)");
             Console.WriteLine("3) view ShipsLog");
             Console.WriteLine("4) clear ShipsLog");
-            Console.WriteLine("Q) Quit Application");
+            Console.WriteLine("5) Send Sluice up/down");
+
+            Console.WriteLine("\nQ) Quit Application");
         }
 
         private static void ClearShipsLog()
@@ -82,7 +91,8 @@ namespace SluiceGate
             {
                 Console.CursorLeft = 0;
                 choice = Char.ToUpper(Console.ReadKey().KeyChar);
-                if (choice == '1' || choice == '2' || choice == '3' || choice == '4' || choice == 'Q')
+                Text.Clearline(0);
+                if (choice == '1' || choice == '2' || choice == '3' || choice == '4' || choice == '5' || choice == 'Q')
                 {
                     isInValidChoice = false;
                 }

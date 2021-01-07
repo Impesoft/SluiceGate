@@ -106,7 +106,11 @@ namespace SluiceGate
         private void HelloManager()
         {
             Console.Clear();
-            Console.WriteLine($"Welcome Sluice Manager (sluice={GlobalVar.SluiceState})");
+            bool sluiceUp = (GlobalVar.SluiceState == StateOfSluice.Up);
+            int indexSluice = Convert.ToInt32(!sluiceUp);
+            int spaceLeft = GlobalVar.SluiceLength - (!sluiceUp ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream);
+            Console.WriteLine($"Welcome Sluice Manager (sluice = {GlobalVar.SluiceState} " +
+                $"{(GlobalVar.ShipsInStream[indexSluice].Count)} ships in {(!sluiceUp ? "upstream" : "downstream")}cue {spaceLeft * 30}m left)");
             Console.WriteLine("----------------------");
         }
 
@@ -119,7 +123,7 @@ namespace SluiceGate
 
         private void EnterNewShip()
         {
-             Length length;// = Length.Special;
+            Length length;// = Length.Special;
             double draft;
             Console.WriteLine("What's the shipsname?");
             string name = InputName();
@@ -128,7 +132,7 @@ namespace SluiceGate
             {
                 toUpdate = true;
                 Ship ship = GetShipInfo(name);
-             //   draft = ship.Draft;
+                //   draft = ship.Draft;
                 length = ship.Length;
             }
             else
@@ -136,9 +140,9 @@ namespace SluiceGate
                 Console.WriteLine("What's the Draft of the ship? (in meters)");
                 draft = InputDraft();
                 if (IsDraftTooDeep(draft, name)) { return; }
-            
-            Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
-            length = InputLength();
+
+                Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
+                length = InputLength();
             }
             Console.WriteLine("Going? up? or down? type 1 for up, 0 for down");
             bool isUpstream = InputDirection();
@@ -147,11 +151,12 @@ namespace SluiceGate
             switch (canBeAdded)
             {
                 case CanBeAdded.Yes:
-                    if (toUpdate) { UpdateShip(name, length, /*draft,*/ isUpstream); } 
+                    if (toUpdate) { UpdateShip(name, length, /*draft,*/ isUpstream); }
                     else { AddShip(name, length, /*draft,*/ isUpstream); }
                     break;
+
                 case CanBeAdded.NoNotCurrently:
-                    CantBeAddedAtThisTime(name, isUpstream);
+                    CantBeAddedAtThisTime(name, isUpstream, length);
                     break;
             }
         }
@@ -166,23 +171,26 @@ namespace SluiceGate
             return ship;
         }
 
-        private void CantBeAddedAtThisTime(string name, bool isUpstream)
+        private void CantBeAddedAtThisTime(string name, bool isUpstream, Length length)
         {
             if (isUpstream)
             {
                 Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                     $"{30 * GlobalVar.LengthShipsInSluiceUpStream} meters");
-                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current upstreamcue({30 * GlobalVar.LengthShipsInSluiceUpStream}m only {30 * (GlobalVar.SluiceLength- GlobalVar.LengthShipsInSluiceUpStream)}).");
+                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current upstreamcue" +
+                    $"(ship={30 * (int)length}m only {30 * (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceUpStream)}m left).");
             }
             else
             {
                 Console.WriteLine($"Sorry this ship can't safely enter the sluice; current total length is " +
                     $"{30 * GlobalVar.LengthShipsInSluiceDownStream} meters");
-                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current downstreamcue({30 * GlobalVar.LengthShipsInSluiceDownStream}m).");
+                FileIO.WriteToLog($"{DateTime.Now}: ship {name} refused reason: Ship too long for current downstreamcue" +
+                    $"(ship={30 * (int)length}m only {30 * (GlobalVar.SluiceLength - GlobalVar.LengthShipsInSluiceDownStream)}m left).");
             }
 
             System.Threading.Thread.Sleep(2000);
         }
+
         private void UpdateShip(string name, Length length, /*double draft,*/ bool isUpstream)
         {
             double toll = PayToll(isUpstream, length);
@@ -193,7 +201,6 @@ namespace SluiceGate
             AddInLocalUpStream(isUpstream, ship);
         }
 
-
         private void AddShip(string name, Length length, /*double draft,*/ bool isUpstream)
         {
             double toll = PayToll(isUpstream, length);
@@ -203,7 +210,7 @@ namespace SluiceGate
                                 $"{(ship.IsUpstream ? "upstream" : "downstream")}."); // , draft:{100 * Math.Round(draft),2}cm
 
             GlobalVar.ShipList.Add(ship);
-            AddInLocalUpStream(isUpstream,ship);
+            AddInLocalUpStream(isUpstream, ship);
         }
 
         private void AddInLocalUpStream(bool isUpstream, Ship ship)
@@ -317,12 +324,12 @@ namespace SluiceGate
 
         private Length InputLength()
         {
-            (bool,Length) noValidInput;
+            (bool, Length) noValidInput;
             do
             {
                 Text.Clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
-                noValidInput= CompleteInput(size);
+                noValidInput = CompleteInput(size);
             } while (noValidInput.Item1);
             return noValidInput.Item2;
         }
@@ -342,14 +349,14 @@ namespace SluiceGate
 
                 case 'M':
                     noValidInput.Item2 = Length.Medium;
-                    Text.Clearline(0); 
+                    Text.Clearline(0);
                     Console.WriteLine("Medium");
                     noValidInput.Item1 = false;
                     break;
 
                 case 'L':
                     noValidInput.Item2 = Length.Long;
-                    Text.Clearline(0); 
+                    Text.Clearline(0);
                     Console.WriteLine("Long");
                     noValidInput.Item1 = false;
                     break;
@@ -358,7 +365,7 @@ namespace SluiceGate
                     Console.CursorLeft = 0;
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Invalid Length");
-                    Console.ResetColor();                    
+                    Console.ResetColor();
                     noValidInput.Item2 = Length.Special;
                     noValidInput.Item1 = true;
                     System.Threading.Thread.Sleep(500);
