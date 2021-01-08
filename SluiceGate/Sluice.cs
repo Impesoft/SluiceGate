@@ -157,7 +157,9 @@ namespace SluiceGate
             {
                 localShip.Toll = PayToll(localShip) + 7;
                 Console.WriteLine($"Special cargo: Toll is now {localShip.Toll}");
-                System.Threading.Thread.Sleep(2000);
+            } else
+            {
+                localShip.Toll= PayToll(localShip);
             }
             CanBeAdded canBeAdded = CheckLength(localShip);
             switch (canBeAdded)
@@ -222,7 +224,7 @@ namespace SluiceGate
         {
             FileIO.WriteToLog($"{ship.ArrivalTime}: ship {ship.Name} arrived (size:" +
                                 $" {ship.Length}cargo:{cargo}) going " +
-                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{(ship.IsUpstream ? $" paying a toll of {ship.Toll} euuro" : "")}.");
+                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{(ship.IsUpstream ? $" paying a toll of {ship.Toll} euro" : "")}.");
             AddInLocalUpStream(ship);
         }
 
