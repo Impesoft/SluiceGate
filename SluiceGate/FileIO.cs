@@ -72,7 +72,7 @@ namespace SluiceGate
             if (File.Exists(GlobalVar.PathShipList))
             {
                 GlobalVar.ShipList = FileIO.ReadShipsFromFile(GlobalVar.PathShipList);
-                GlobalVar.Id = GlobalVar.ShipList[ GlobalVar.ShipList.Count - 1].Id;
+                GlobalVar.Id = GlobalVar.ShipList[GlobalVar.ShipList.Count - 1].Id;
                 //  todo set id to id of last ship in list
             }
         }

@@ -157,7 +157,8 @@ namespace SluiceGate
             {
                 localShip.Toll = PayToll(localShip) + 7;
                 Console.WriteLine($"Special cargo: Toll is now {localShip.Toll}");
-            } else
+            }
+            else
             {
                 localShip.Toll = PayToll(localShip);
             }

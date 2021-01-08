@@ -18,22 +18,28 @@ namespace SluiceGate
                     case '1':
                         sluice.AddShips();
                         break;
+
                     case '2':
                         sluice.ViewShips();
                         break;
+
                     case '3':
                         Console.Clear();
                         ViewShipsLog();
                         break;
+
                     case '4':
                         ClearShipsLog();
                         break;
+
                     case '5':
                         sluice.ChangeSluiceState();
                         break;
+
                     case 'Q':
                         quit = true;
                         break;
+
                     default:
                         break;
                 }

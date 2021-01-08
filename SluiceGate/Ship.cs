@@ -6,6 +6,7 @@ namespace SluiceGate
     {
         private int id;
         public double Toll { get; set; }
+
         public int Id
         {
             get
@@ -20,6 +21,7 @@ namespace SluiceGate
                 }
             }
         }
+
         public string Name { get; set; }
 
         public Length Length
@@ -46,7 +48,7 @@ namespace SluiceGate
             Name = "Not Set";
             Length = Length.Medium;
             ArrivalTime = DateTime.Now;
-            IsUpstream = true; 
+            IsUpstream = true;
             Toll = 0;
         }
 
