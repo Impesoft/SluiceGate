@@ -129,11 +129,11 @@ namespace SluiceGate
         private void EnterNewShip()
         {
             Ship localShip = new Ship();
-            //Length length;
-            double draft; string cargo; bool toUpdate = false;
-
-            Console.WriteLine("What's the shipsname?"); localShip.Name = InputName();
-
+            double draft;
+            string cargo;
+            bool toUpdate = false;
+            Console.WriteLine("What's the shipsname?");
+            localShip.Name = InputName();
             if ((GlobalVar.ShipList.Any(ship => ship.Name == localShip.Name)))
             {
                 toUpdate = true;
@@ -157,7 +157,8 @@ namespace SluiceGate
             {
                 localShip.Toll = PayToll(localShip) + 7;
                 Console.WriteLine($"Special cargo: Toll is now {localShip.Toll}");
-            } else
+            }
+            else
             {
                 localShip.Toll = PayToll(localShip);
             }
