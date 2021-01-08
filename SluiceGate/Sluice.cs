@@ -159,7 +159,7 @@ namespace SluiceGate
                 Console.WriteLine($"Special cargo: Toll is now {localShip.Toll}");
             } else
             {
-                localShip.Toll= PayToll(localShip);
+                localShip.Toll = PayToll(localShip);
             }
             CanBeAdded canBeAdded = CheckLength(localShip);
             switch (canBeAdded)

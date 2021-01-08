@@ -45,9 +45,10 @@ namespace SluiceGate
             Console.Clear();
             bool sluiceUp = (GlobalVar.SluiceState == StateOfSluice.Up);
             int indexSluice = Convert.ToInt32(sluiceUp);
-            Console.WriteLine($"Welcome Sluice Manager  [sluice = {GlobalVar.SluiceState} (" +
-                $"{(GlobalVar.ShipsInStream[indexSluice].Count)} ships in {(sluiceUp ? "upstream" : "downstream")}cue / " +
-                $"{(GlobalVar.ShipsInStream[1-indexSluice].Count)} ships in {(!sluiceUp ? "upstream" : "downstream")}cue)]");
+            Console.WriteLine($"Welcome Sluice Manager");
+            string text = $"[sluice = {GlobalVar.SluiceState} ({(GlobalVar.ShipsInStream[indexSluice].Count)} ships in {(sluiceUp ? "upstream" : "downstream")}cue / " +
+                $"{(GlobalVar.ShipsInStream[1 - indexSluice].Count)} ships in {(!sluiceUp ? "upstream" : "downstream")}cue)]";
+            Text.WriteRight(text, 0);
             Console.WriteLine("----------------------\n");
             Console.WriteLine("1) add Ships");
             Console.WriteLine("2) view ships (and their latest updates)");
