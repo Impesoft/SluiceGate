@@ -224,21 +224,23 @@ namespace SluiceGate
         private void UpdateShip(Ship ship, string cargo)
         {
             FileIO.WriteToLog($"{ship.ArrivalTime}: ship {ship.Name} arrived (size:" +
-                                $" {ship.Length}cargo:{cargo}) going " +
-                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{(ship.IsUpstream ? $" paying a toll of {ship.Toll} euro" : "")}.");
-            AddInLocalUpStream(ship);
+                                $" {ship.Length} cargo:{cargo}) going " +
+                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{((ship.Toll > 0) ? $" paying a toll of {ship.Toll} euro" : "")}.");
+            int shipIndex = GlobalVar.ShipList.FindIndex(ship1 => ship1.Name == ship.Name);
+            GlobalVar.ShipList[shipIndex] = ship;
+            AddInLocalStream(ship);
         }
 
         private void AddShip(Ship ship, string cargo)
         {
             FileIO.WriteToLog($"{ship.ArrivalTime}: ship {ship.Name} arrived (size:" +
                                 $" {ship.Length} cargo:{cargo}) going " +
-                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{(ship.IsUpstream ? $" paying a toll of {ship.Toll} euro" : "")}.");
+                                $"{(ship.IsUpstream ? "upstream" : "downstream")}{((ship.Toll > 0) ? $" paying a toll of {ship.Toll} euro" : "")}.");
             GlobalVar.ShipList.Add(ship);
-            AddInLocalUpStream(ship);
+            AddInLocalStream(ship);
         }
 
-        private void AddInLocalUpStream(Ship ship)
+        private void AddInLocalStream(Ship ship)
         {
             bool isUpstream = ship.IsUpstream;
             GlobalVar.ShipsInStream[(isUpstream ? 1 : 0)].Add(ship);
@@ -352,41 +354,38 @@ namespace SluiceGate
 
         private Length InputLength()
         {
-            (bool, Length) noValidInput;
+            Length length;
             do
             {
                 Text.Clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
-                noValidInput = CompleteInput(size);
-            } while (noValidInput.Item1);
-            return noValidInput.Item2;
+                length = CompleteInput(size);
+            } while (length==Length.NotSet);
+            return length;
         }
 
-        private (bool, Length) CompleteInput(char size)
+        private Length CompleteInput(char size)
         {
-            (bool, Length) noValidInput;
+           Length noValidInput;
 
             switch (size)
             {
                 case 'S':
-                    noValidInput.Item2 = Length.Small;
+                    noValidInput = Length.Small;
                     Text.Clearline(0);
                     Console.WriteLine("Small");
-                    noValidInput.Item1 = false;
                     break;
 
                 case 'M':
-                    noValidInput.Item2 = Length.Medium;
+                    noValidInput = Length.Medium;
                     Text.Clearline(0);
                     Console.WriteLine("Medium");
-                    noValidInput.Item1 = false;
                     break;
 
                 case 'L':
-                    noValidInput.Item2 = Length.Long;
+                    noValidInput = Length.Long;
                     Text.Clearline(0);
                     Console.WriteLine("Long");
-                    noValidInput.Item1 = false;
                     break;
 
                 default:
@@ -394,8 +393,7 @@ namespace SluiceGate
                     Console.ForegroundColor = ConsoleColor.Red;
                     Console.Write("Invalid Length");
                     Console.ResetColor();
-                    noValidInput.Item2 = Length.Small;
-                    noValidInput.Item1 = true;
+                    noValidInput = Length.NotSet;
                     System.Threading.Thread.Sleep(500);
                     break;
             }
