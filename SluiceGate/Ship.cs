@@ -35,7 +35,7 @@ namespace SluiceGate
         }
 
         private Length length;
-        public DateTime ArrivalTime = DateTime.Now;
+        public DateTime ArrivalTime { get; set; } = DateTime.Now;
 
         public bool IsUpstream { get; set; }
 
@@ -44,7 +44,7 @@ namespace SluiceGate
             GlobalVar.Id++;
             id = GlobalVar.Id;
             Name = "Not Set";
-            Length = (Length)2;
+            Length = Length.Medium;
             ArrivalTime = DateTime.Now;
             IsUpstream = true; 
             Toll = 0;
