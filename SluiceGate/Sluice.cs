@@ -68,10 +68,33 @@ namespace SluiceGate
             {
                 Console.WriteLine("The Shiplist is currently empty.");
             }
-            Console.WriteLine("press any key to return to the menu");
+            Console.WriteLine("\npress any key to return to the menu");
             Console.ReadKey();
         }
+        public  void ClearShipsLog()
+        {
+            FileIO.ClearShipsLogged();
+            Console.WriteLine("Log Cleared, returning to the main menu");
+            System.Threading.Thread.Sleep(2000);
+        }
 
+        public void ViewShipsLog()
+        {
+            List<string> log = FileIO.ReadShipLogFromFile();
+            if (log[0] == "empty")
+            {
+                Console.WriteLine("The log is empty.");
+            }
+            else
+            {
+                foreach (string item in log)
+                {
+                    Console.WriteLine(item.ToString());
+                }
+            }
+            Console.WriteLine("\npress any key to go back to the main menu");
+            Console.ReadKey();
+        }
         public void AddShips()
         {
             bool keeprunning;
@@ -94,7 +117,7 @@ namespace SluiceGate
 
             if ((GlobalVar.SluiceLength - (sluiceDown ? GlobalVar.LengthShipsInSluiceUpStream : GlobalVar.LengthShipsInSluiceDownStream)) > 0)
             {
-                Console.WriteLine("Press (S) to send sluice enroute, or another key to add another ship?");
+                Console.WriteLine("\nPress (S) to send sluice enroute, or another key to add another ship?");
                 keeprunning = char.ToUpper(Console.ReadKey().KeyChar) != 'S';
             }
             else
@@ -191,9 +214,10 @@ namespace SluiceGate
         private Ship GetShipInfo(string name)
         {
             Ship ship = GlobalVar.ShipList.FirstOrDefault(ship => ship.Name == name);
-
+            Console.ForegroundColor = ConsoleColor.DarkGreen;
             Console.WriteLine("ship already in database. reading info");
-            System.Threading.Thread.Sleep(2000);
+            System.Threading.Thread.Sleep(1500);
+            Console.ResetColor();
             Text.Clearline(-1);
             return ship;
         }
@@ -310,7 +334,11 @@ namespace SluiceGate
                 }
                 else
                 {
+                    Text.Clearline(-1);
+                    Console.ForegroundColor = ConsoleColor.Red;
                     Console.WriteLine("I said 1 or 0!!");
+                    System.Threading.Thread.Sleep(1000);
+                    Console.ResetColor();
                     isInValidDirection = true;
                 }
             } while (isInValidDirection);

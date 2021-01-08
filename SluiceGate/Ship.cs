@@ -4,23 +4,8 @@ namespace SluiceGate
 {
     public class Ship
     {
-        private int id;
         public double Toll { get; set; }
 
-        public int Id
-        {
-            get
-            {
-                return id;
-            }
-            set
-            {
-                if (value > 0)
-                {
-                    id = value;
-                }
-            }
-        }
 
         public string Name { get; set; }
 
@@ -43,8 +28,6 @@ namespace SluiceGate
 
         public Ship() //constructor no arguments for XML parsing
         {
-            GlobalVar.Id++;
-            id = GlobalVar.Id;
             Name = "Not Set";
             Length = Length.Medium;
             ArrivalTime = DateTime.Now;
@@ -54,8 +37,6 @@ namespace SluiceGate
 
         public Ship(string name, Length length, bool direction, double toll) // constructor with arguments
         {
-            GlobalVar.Id++;
-            id = GlobalVar.Id;
             Name = name;
             Length = (Length)length;
             ArrivalTime = DateTime.Now;

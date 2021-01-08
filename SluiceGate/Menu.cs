@@ -25,11 +25,11 @@ namespace SluiceGate
 
                     case '3':
                         Console.Clear();
-                        ViewShipsLog();
+                        sluice.ViewShipsLog();
                         break;
 
                     case '4':
-                        ClearShipsLog();
+                        sluice.ClearShipsLog();
                         break;
 
                     case '5':
@@ -65,30 +65,7 @@ namespace SluiceGate
             Console.WriteLine("\nQ) Quit Application");
         }
 
-        private static void ClearShipsLog()
-        {
-            FileIO.ClearShipsLogged();
-            Console.WriteLine("Log Cleared, returning to the main menu");
-            System.Threading.Thread.Sleep(2000);
-        }
 
-        private static void ViewShipsLog()
-        {
-            List<string> log = FileIO.ReadShipLogFromFile();
-            if (log[0] == "empty")
-            {
-                Console.WriteLine("The log is empty.");
-            }
-            else
-            {
-                foreach (string item in log)
-                {
-                    Console.WriteLine(item.ToString());
-                }
-            }
-            Console.WriteLine("press any key to go back to the main menu");
-            Console.ReadKey();
-        }
 
         private static char InputManagersChoice()
         {

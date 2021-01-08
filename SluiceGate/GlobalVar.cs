@@ -13,7 +13,6 @@ namespace SluiceGate
         public static string SluiceLogPath = $"{documents}\\ShipsLogged.txt";
 
         //declare global veriables
-        public static int Id;
 
         public static StateOfSluice SluiceState = StateOfSluice.Up;
         public static bool[] SluiceFull = { false, false };
