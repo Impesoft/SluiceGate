@@ -15,5 +15,10 @@ namespace SluiceGate
             Console.Write(new string(' ', Console.WindowWidth));
             Console.SetCursorPosition(0, intendedY);
         }
+        public static void WriteRight (string text, int top)
+        {
+            Console.SetCursorPosition(Console.WindowWidth - text.Length, top);
+            Console.Write(text);
+        }
     }
 }
