@@ -80,6 +80,7 @@ namespace SluiceGate
 
         public void ViewShipsLog()
         {
+            double totalToll = 0;
             List<string> log = FileIO.ReadShipLogFromFile();
             if (log[0] == "empty")
             {
@@ -87,11 +88,20 @@ namespace SluiceGate
             }
             else
             {
+                String[] separator = { "ship ", " arrived going ", " paying a toll of", " euro." };
                 foreach (string item in log)
                 {
-                    Console.WriteLine(item.ToString());
+                    int openRound = item.IndexOf('(');
+                    int closeRound = item.IndexOf(')');
+                    Console.WriteLine(item);
+                    string lengthAndCargoRemoved =item.ToString().Remove(openRound, (closeRound-openRound+2));
+                    String[] subitems = lengthAndCargoRemoved.Split(separator, StringSplitOptions.RemoveEmptyEntries);
+                    if (item.ToString().Contains("toll")) { totalToll += Convert.ToDouble(subitems[subitems.Length - 1]); }
                 }
             }
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine($"\nThat's {log.Count} entries for a total of {totalToll} euro in toll.");
+            Console.ResetColor();
             Console.WriteLine("\npress any key to go back to the main menu");
             Console.ReadKey();
         }
