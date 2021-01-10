@@ -98,10 +98,10 @@ namespace SluiceGate
                     String[] subitems = lengthAndCargoRemoved.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                     if (item.ToString().Contains("toll")) { totalToll += Convert.ToDouble(subitems[subitems.Length - 1]); }
                 }
+                Console.ForegroundColor = ConsoleColor.Yellow;
+                Console.WriteLine($"\nThat's {log.Count} entries for a total of {totalToll} euro in toll.");
+                Console.ResetColor();
             }
-            Console.ForegroundColor = ConsoleColor.Yellow;
-            Console.WriteLine($"\nThat's {log.Count} entries for a total of {totalToll} euro in toll.");
-            Console.ResetColor();
             Console.WriteLine("\npress any key to go back to the main menu");
             Console.ReadKey();
         }
