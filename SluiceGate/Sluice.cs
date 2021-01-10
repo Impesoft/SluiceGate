@@ -167,6 +167,13 @@ namespace SluiceGate
             bool toUpdate = false;
             Console.WriteLine("What's the shipsname?");
             localShip.Name = InputName();
+           if  (CheckIfAlreadyInCue(localShip.Name))
+            {
+                Console.ForegroundColor = ConsoleColor.Red;
+                Console.WriteLine($"a ship with name {localShip.Name} was already entered in current cues");
+                Console.ResetColor();
+                return;
+            }
             if ((GlobalVar.ShipList.Any(ship => ship.Name == localShip.Name)))
             {
                 toUpdate = true;
@@ -207,6 +214,11 @@ namespace SluiceGate
                     CantBeAddedAtThisTime(localShip);
                     break;
             }
+        }
+
+        private bool CheckIfAlreadyInCue(string name)
+        {
+            return GlobalVar.ShipsInStream[0].Any(ship => ship.Name == name) || (GlobalVar.ShipsInStream[1].Any(ship => ship.Name == name));
         }
 
         private string Cargo()
@@ -261,7 +273,11 @@ namespace SluiceGate
                                 $" {ship.Length} cargo:{cargo}) going " +
                                 $"{(ship.IsUpstream ? "upstream" : "downstream")}{((ship.Toll > 0) ? $" paying a toll of {ship.Toll} euro" : "")}.");
             int shipIndex = GlobalVar.ShipList.FindIndex(ship1 => ship1.Name == ship.Name);
+            double currentTollforShip = GlobalVar.ShipList[shipIndex].Toll;
+            double newTollForShip = currentTollforShip + ship.Toll;
+            ship.Toll = newTollForShip;
             GlobalVar.ShipList[shipIndex] = ship;
+
             AddInLocalStream(ship);
         }
 
