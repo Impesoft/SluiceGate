@@ -19,5 +19,19 @@ namespace SluiceGate
             Console.SetCursorPosition(Console.WindowWidth - text.Length, top);
             Console.Write(text);
         }
+
+        internal static void WriteinTime(string text)
+        {
+            Console.WriteLine(text);
+            Console.ForegroundColor = ConsoleColor.White;
+            Console.BackgroundColor = ConsoleColor.DarkGray;
+            Console.CursorTop = Console.CursorTop - 1;
+            foreach (char c in text)
+            {
+                Console.Write(c);
+                System.Threading.Thread.Sleep(75);
+            }
+            Console.ResetColor();
+        }
     }
 }
