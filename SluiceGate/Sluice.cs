@@ -71,7 +71,8 @@ namespace SluiceGate
             Console.WriteLine("\npress any key to return to the menu");
             Console.ReadKey();
         }
-        public  void ClearShipsLog()
+
+        public void ClearShipsLog()
         {
             FileIO.ClearShipsLogged();
             Console.WriteLine("Log Cleared, returning to the main menu");
@@ -94,7 +95,7 @@ namespace SluiceGate
                     int openRound = item.IndexOf('(');
                     int closeRound = item.IndexOf(')');
                     Console.WriteLine(item);
-                    string lengthAndCargoRemoved =item.ToString().Remove(openRound, (closeRound-openRound+2));
+                    string lengthAndCargoRemoved = item.ToString().Remove(openRound, (closeRound - openRound + 2));
                     String[] subitems = lengthAndCargoRemoved.Split(separator, StringSplitOptions.RemoveEmptyEntries);
                     if (item.ToString().Contains("toll")) { totalToll += Convert.ToDouble(subitems[subitems.Length - 1]); }
                 }
@@ -105,6 +106,7 @@ namespace SluiceGate
             Console.WriteLine("\npress any key to go back to the main menu");
             Console.ReadKey();
         }
+
         public void AddShips()
         {
             bool keeprunning;
@@ -165,13 +167,10 @@ namespace SluiceGate
             double draft;
             string cargo;
             bool toUpdate = false;
-            Console.WriteLine("What's the shipsname?");
             localShip.Name = InputName();
-           if  (CheckIfAlreadyInCue(localShip.Name))
+            if (CheckIfAlreadyInCue(localShip.Name))
             {
-                Console.ForegroundColor = ConsoleColor.Red;
-                Console.WriteLine($"a ship with name {localShip.Name} was already entered in current cues");
-                Console.ResetColor();
+                AlreadyInCueError(localShip);
                 return;
             }
             if ((GlobalVar.ShipList.Any(ship => ship.Name == localShip.Name)))
@@ -179,29 +178,16 @@ namespace SluiceGate
                 toUpdate = true;
                 Ship ship = GetShipInfo(localShip.Name);
                 localShip.Length = ship.Length;
-                Console.WriteLine("What's the Draft of the ship? (in meters)");
                 draft = InputDraft();
                 if (IsDraftTooDeep(draft, localShip.Name)) { return; }
             }
             else
             {
-                Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
                 localShip.Length = InputLength();
             }
-            Console.WriteLine("Going? up? or down? type 1 for up, 0 for down");
             localShip.IsUpstream = InputDirection();
             if (IsSluiceFull(localShip.IsUpstream)) { return; }
-            Console.WriteLine("what is your cargo?");
-            cargo = Cargo();
-            if (HasGasOrExplosivesOrFlammable(cargo))
-            {
-                localShip.Toll = PayToll(localShip) + 7;
-                Console.WriteLine($"Special cargo: Toll is now {localShip.Toll}");
-            }
-            else
-            {
-                localShip.Toll = PayToll(localShip);
-            }
+            cargo = InputCargo(localShip);
             CanBeAdded canBeAdded = CheckLength(localShip);
             switch (canBeAdded)
             {
@@ -216,14 +202,33 @@ namespace SluiceGate
             }
         }
 
+        private void AlreadyInCueError(Ship localShip)
+        {
+            Console.ForegroundColor = ConsoleColor.Red;
+            Console.WriteLine($"a ship with name {localShip.Name} was already entered in current cues");
+            Console.ResetColor();
+        }
+
         private bool CheckIfAlreadyInCue(string name)
         {
             return GlobalVar.ShipsInStream[0].Any(ship => ship.Name == name) || (GlobalVar.ShipsInStream[1].Any(ship => ship.Name == name));
         }
 
-        private string Cargo()
+        private string InputCargo(Ship ship)
         {
-            return Console.ReadLine();
+            Console.WriteLine("what is your cargo?");
+
+            string cargo = Console.ReadLine();
+            if (HasGasOrExplosivesOrFlammable(cargo))
+            {
+                ship.Toll = PayToll(ship) + 7;
+                Console.WriteLine($"Special cargo charge 7 euro: toll is now {ship.Toll} euro");
+            }
+            else
+            {
+                ship.Toll = PayToll(ship);
+            }
+            return cargo;
         }
 
         private bool HasGasOrExplosivesOrFlammable(string cargo)
@@ -236,11 +241,9 @@ namespace SluiceGate
         private Ship GetShipInfo(string name)
         {
             Ship ship = GlobalVar.ShipList.FirstOrDefault(ship => ship.Name == name);
-            Console.ForegroundColor = ConsoleColor.DarkGreen;
-            Console.WriteLine("ship already in database. reading info");
-            System.Threading.Thread.Sleep(1500);
-            Console.ResetColor();
-            Text.Clearline(-1);
+            string text = "ship already in database. reading info";
+            Text.WriteinTime(text);
+            Text.Clearline(0);
             return ship;
         }
 
@@ -320,6 +323,8 @@ namespace SluiceGate
 
         private string InputName()
         {
+            Console.WriteLine("What's the shipsname?");
+
             string name = "";
             bool isValidName;
             do
@@ -341,6 +346,8 @@ namespace SluiceGate
 
         private bool InputDirection()
         {
+            Console.WriteLine("Going? up? or down? type 1 for up, 0 for down");
+
             bool isInValidDirection;
             bool direction = true;
             int top = Console.CursorTop;
@@ -380,13 +387,15 @@ namespace SluiceGate
             if (isUpstream)
             {
                 toll = (int)length * 5;
-                Console.WriteLine("Toll to Pay: " + toll + " Euro");
+                Console.WriteLine("Toll to Pay (going upstream): " + toll + " euro");
             }
             return toll;
         }
 
         private double InputDraft()
         {
+            Console.WriteLine("What's the Draft of the ship? (in meters)");
+
             double draft = 0.0;
             bool noValidDraft;
             do
@@ -408,19 +417,21 @@ namespace SluiceGate
 
         private Length InputLength()
         {
+            Console.WriteLine("What's the length of the ship? (S)mall, (M)edium, (L)ong");
+
             Length length;
             do
             {
                 Text.Clearline(0);
                 char size = char.ToUpper(Console.ReadKey().KeyChar);
                 length = CompleteInput(size);
-            } while (length==Length.NotSet);
+            } while (length == Length.NotSet);
             return length;
         }
 
         private Length CompleteInput(char size)
         {
-           Length noValidInput;
+            Length noValidInput;
 
             switch (size)
             {
